@@ -218,3 +218,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Python tooling
+.ruff_cache/
+.uv-cache/
