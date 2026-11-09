@@ -11,15 +11,21 @@ Copy-Item .env.example .env
 uv sync --dev
 ```
 
-Set `ATT_DEV_API_KEY` in `.env` to a locally generated value of at least 32 characters, then start the API:
+Set `ATT_DEV_API_KEY` in `.env` to a locally generated value of at least 32 characters. To run the API directly, set `ATT_DATABASE_URL` to the async PostgreSQL URL for your local database, then start it:
 
 ```powershell
 uv run uvicorn attestra.app:create_app --factory --reload
 ```
 
-The API listens on `http://localhost:8000`. The health routes are `/healthz` and `/readyz`; readiness is a stub until database integration is implemented.
+For Compose, set `ATT_DATABASE_URL` to the async PostgreSQL URL using host `postgres`, and set `POSTGRES_PASSWORD` to the same database password. URL-encode special characters in the password. Apply the schema before starting the container:
 
-To run the API with PostgreSQL 16, set both `ATT_DEV_API_KEY` and `POSTGRES_PASSWORD` in your local `.env` file before starting Compose:
+```powershell
+docker compose run --rm api uv run alembic upgrade head
+```
+
+The API listens on `http://localhost:8000`. `/healthz` reports process health, while `/readyz` verifies database connectivity.
+
+To run the API with PostgreSQL 16, set `ATT_DEV_API_KEY`, `ATT_DATABASE_URL`, and `POSTGRES_PASSWORD` in your local `.env` file before starting Compose:
 
 ```powershell
 docker compose up --build
