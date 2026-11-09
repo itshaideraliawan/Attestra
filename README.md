@@ -45,3 +45,7 @@ Configuration is read from `ATT_`-prefixed environment variables. See `.env.exam
 ## Authentication
 
 Local development uses `ATT_AUTH_MODE=api_key` and requires a randomly generated `ATT_DEV_API_KEY` of at least 32 characters. The service refuses API key mode outside the development environment. For Entra ID, set `ATT_AUTH_MODE=entra`, `ATT_ENTRA_ISSUER`, `ATT_ENTRA_AUDIENCE`, and `ATT_ENTRA_ALLOWED_CLIENTS` (a JSON array of client IDs). Protected requests include `X-Tenant-Id` and `X-User-Id`; Entra requests also include an `Authorization: Bearer` access token.
+
+## Model providers
+
+Azure OpenAI uses `ATT_AZURE_OPENAI_ENDPOINT`, `ATT_AZURE_OPENAI_API_KEY`, and `ATT_AZURE_OPENAI_DEPLOYMENTS` (a JSON object mapping `fast` and `strong` tiers to deployment names). `ATT_AZURE_OPENAI_API_VERSION` defaults to `v1`. OpenAI-compatible endpoints use `ATT_OPENAI_COMPATIBLE_BASE_URL`, optional `ATT_OPENAI_COMPATIBLE_API_KEY`, and `ATT_OPENAI_COMPATIBLE_MODELS` with the same tier mapping. Providers expose a `pii_allowed` capability flag, false by default; the task pipeline must enforce tenant policy and redaction before sending any prompt. Token cost rates are optional and configured per 1,000 tokens. Provider calls use bounded retries, provider-local circuit breakers, and `ATT_PROVIDER_TIMEOUT_SECONDS`.
