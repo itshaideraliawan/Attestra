@@ -36,3 +36,12 @@ def test_api_key_mode_is_restricted_to_development() -> None:
 def test_entra_mode_requires_issuer_audience_and_clients() -> None:
     with pytest.raises(ValueError, match="issuer, audience, and allowed clients"):
         Settings(auth_mode="entra")
+
+
+def test_model_provider_settings_default_to_safe_retry_and_pii_values() -> None:
+    settings = Settings(dev_api_key=SecretStr(secrets.token_urlsafe(32)))
+
+    assert settings.provider_max_attempts == 3
+    assert settings.provider_timeout_seconds == 60
+    assert settings.azure_openai_pii_allowed is False
+    assert settings.openai_compatible_pii_allowed is False
