@@ -6,6 +6,7 @@ services:
     environment:
       ATT_ENVIRONMENT: ${ATT_ENVIRONMENT:-development}
       ATT_LOG_LEVEL: ${ATT_LOG_LEVEL:-INFO}
+      ATT_DATABASE_URL: ${ATT_DATABASE_URL:?Set ATT_DATABASE_URL in .env}
     ports:
       - "8000:8000"
     depends_on:

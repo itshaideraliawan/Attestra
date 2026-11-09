@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     entra_issuer: AnyHttpUrl | None = None
     entra_audience: str | None = None
     entra_allowed_clients: list[str] = Field(default_factory=list)
+    database_url: str = "postgresql+asyncpg://localhost/attestra"
+    tenant_policy_cache_seconds: float = Field(default=30.0, gt=0, le=300)
 
     @model_validator(mode="after")
     def validate_auth_configuration(self) -> "Settings":
