@@ -3,6 +3,7 @@ from collections.abc import Iterator
 import anyio
 import docker
 import pytest
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine
 from testcontainers.community.postgres import PostgresContainer
 
@@ -31,6 +32,7 @@ def test_postgres_repository_prevents_cross_tenant_reads(postgres_url: str) -> N
         engine = create_async_engine(postgres_url, pool_pre_ping=True)
         try:
             async with engine.begin() as connection:
+                await connection.execute(text("CREATE SCHEMA attestra"))
                 await connection.run_sync(Base.metadata.create_all)
             session_factory = create_session_factory(engine)
             async with session_factory() as session:
@@ -42,8 +44,6 @@ def test_postgres_repository_prevents_cross_tenant_reads(postgres_url: str) -> N
                 assert await repository.get("tenant-a", run.id) == run
                 assert await repository.get("tenant-b", run.id) is None
         finally:
-            async with engine.begin() as connection:
-                await connection.run_sync(Base.metadata.drop_all)
             await engine.dispose()
 
     anyio.run(verify_isolation)
