@@ -1,6 +1,6 @@
 """HTTP request context middleware."""
 
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import structlog
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
@@ -19,8 +19,18 @@ class RequestIdMiddleware:
 
         headers = dict(scope.get("headers", []))
         request_id = headers.get(b"x-request-id", b"").decode("ascii", errors="ignore").strip()
-        if not request_id:
+        try:
+            parsed_request_id = UUID(request_id)
+        except ValueError:
             request_id = str(uuid4())
+        else:
+            request_id = (
+                str(parsed_request_id)
+                if len(request_id) == 36 and str(parsed_request_id) == request_id.lower()
+                else str(uuid4())
+            )
+
+        scope.setdefault("state", {})["request_id"] = request_id
 
         structlog.contextvars.bind_contextvars(request_id=request_id)
 
